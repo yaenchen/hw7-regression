@@ -10,7 +10,7 @@ This is not an exhaustive list.
 
 # Imports
 import pytest
-from regression import (logreg, utils)
+from regression import (logreg, utils, )
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import log_loss
 import numpy as np
@@ -45,6 +45,8 @@ def import_data():
 
 	X_val = np.hstack([X_val, np.ones((X_val.shape[0], 1))])
 	preds = log_model.make_prediction(X_val)[0:10]
+	
+	return (log_model, X_train, X_val, y_train, y_val, preds)
 
 def test_prediction():
 	# generate predictions and make sure they are close to the actual data
@@ -57,21 +59,21 @@ def test_prediction():
 	assert np.allclose(preds, preds_check), "Predictions do not match expected"
 
 def test_loss_function():
-	import_data()
+	log_model, X_train, X_val, y_train, y_val, preds = import_data()
 	# compare loss to sklearn loss
 	my_losses = log_model.loss_function(y_val, log_model.make_prediction(X_val))
 	sklearn_losses = log_loss(y_val, preds)
 	assert np.is_close(my_losses, sklearn_losses), "Implemented loss does not match sklearn calculated loss"
 
 def test_gradient():
-	import_data()
+	log_model, X_train, X_val, y_train, y_val, preds = import_data()
 	# calculate gradient
 	gradient = log_model.calculate_gradient(y_val, X_val)
 	assert gradient == np.array([-0.2784112, -0.1937338,  0.01551079,  0.,  0.,
         0.06515538,  0.07522936])
 
 def test_training():
-	import_data()
+	log_model, X_train, X_val, y_train, y_val, preds = import_data()
 	# check that the trained model has updated weights
 	# np.random.randn(num_feats + 1).flatten() is how the weights were initialized
 	assert np.alltrue(log_model.W != np.random.randn(num_feats=6 + 1).flatten()), "Weights have not been updated after training"
