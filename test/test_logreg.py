@@ -10,7 +10,7 @@ This is not an exhaustive list.
 
 # Imports
 import pytest
-import regression
+from regression import (logreg, utils)
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import log_loss
 import numpy as np
