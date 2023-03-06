@@ -50,7 +50,7 @@ def import_data():
 
 def test_prediction():
 	# generate predictions and make sure they are close to the actual data
-	import_data()
+	log_model, X_train, X_val, y_train, y_val, preds = import_data()
 	# check that we get the expected number of predictions
 	assert np.shape(preds) == (10,), "Incorrect number of predictions"
 	# check our predictions
@@ -62,18 +62,18 @@ def test_loss_function():
 	log_model, X_train, X_val, y_train, y_val, preds = import_data()
 	# compare loss to sklearn loss
 	my_losses = log_model.loss_function(y_val, log_model.make_prediction(X_val))
-	sklearn_losses = log_loss(y_val, preds)
+	sklearn_losses = log_loss(y_val, X_val)
 	assert np.is_close(my_losses, sklearn_losses), "Implemented loss does not match sklearn calculated loss"
 
 def test_gradient():
 	log_model, X_train, X_val, y_train, y_val, preds = import_data()
 	# calculate gradient
 	gradient = log_model.calculate_gradient(y_val, X_val)
-	assert gradient == np.array([-0.2784112, -0.1937338,  0.01551079,  0.,  0.,
-        0.06515538,  0.07522936])
+	assert np.all(gradient == np.array([-0.2784112, -0.1937338,  0.01551079,  0.,  0.,
+        0.06515538,  0.07522936]))
 
 def test_training():
 	log_model, X_train, X_val, y_train, y_val, preds = import_data()
 	# check that the trained model has updated weights
 	# np.random.randn(num_feats + 1).flatten() is how the weights were initialized
-	assert np.alltrue(log_model.W != np.random.randn(num_feats=6 + 1).flatten()), "Weights have not been updated after training"
+	assert np.alltrue(log_model.W != np.random.randn(6 + 1).flatten()), "Weights have not been updated after training"
