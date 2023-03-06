@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # (this is already complete!)
 class BaseRegressor():
 
-    def __init__(self, num_feats, learning_rate=0.01, tol=0.001, max_iter=100, batch_size=10):
+    def __init__(self, num_feats, learning_rate=0.01, tol=0.001, max_iter=100, batch_size=10, error=1e-7):
 
         # Weights are randomly initialized
         self.W = np.random.randn(num_feats + 1).flatten()
@@ -16,6 +16,7 @@ class BaseRegressor():
         self.max_iter = max_iter
         self.batch_size = batch_size
         self.num_feats = num_feats
+        self.error=error
 
         # Define empty lists to store losses over training
         self.loss_hist_train = []
@@ -130,7 +131,7 @@ class LogisticRegressor(BaseRegressor):
             The predicted labels (y_pred) for given X.
         """
         # calculate prediction with sigmoid
-        predictions = 1 / (1 + np.e ** (-(np.dot(X, self.W))))
+        predictions = 1 / (1 + np.exp(-(np.dot(X, self.W))))
 
         return predictions
 
@@ -147,7 +148,9 @@ class LogisticRegressor(BaseRegressor):
         Returns:
             The mean loss (a single number).
         """
-
+        # prevent divide by zero error
+        y_pred[y_pred == 0] = self.error
+        y_pred[y_pred == 1] = 1 - self.error
         # calculate loss
         mean_loss = -np.mean((y_true * np.log(y_pred)) + ((1 - y_true) * np.log(1 - y_pred)))
 
@@ -167,6 +170,6 @@ class LogisticRegressor(BaseRegressor):
         """
         y_pred = self.make_prediction(X)
 
-        gradient = -np.dot(X.T, (y_pred - y_true)) / len(y_true)
+        gradient = -np.dot(X.T, (y_true - y_pred)) / len(y_true)
 
         return gradient
